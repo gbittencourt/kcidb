@@ -376,6 +376,7 @@ def ingest_main():
                                     description=description)
     args = parser.parse_args()
 
+    print(args.database)
     db_client = db.Client(args.database)
     if not db_client.is_initialized():
         db_client.init()
