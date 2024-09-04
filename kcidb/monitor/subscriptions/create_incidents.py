@@ -1,9 +1,9 @@
 from kcidb.tools import kcidb_match
 import kcidb
 import os
+import json
 
 CLIENT = None
-
 
 def get_client():
     global CLIENT
@@ -16,14 +16,15 @@ def get_client():
             CLIENT = kcidb.Client(project_id=project_id, topic_name=topic_name)
     
     return CLIENT
-
+#    return True
 
 def match_test(test):
     client = get_client()
     if client:
         incident_generator = kcidb_match.IncidentGenerator()
         incidents = incident_generator.generate_incidents_from_test(test)
-        client.submit(incidents)
+        #client.submit(incidents)
+        print(json.dumps(incidents))
 
 
 def match_build(build):
@@ -31,7 +32,8 @@ def match_build(build):
     if client:
         incident_generator = kcidb_match.IncidentGenerator()
         incidents = incident_generator.generate_incidents_from_build(build)
-        client.submit(incidents)
+        #client.submit(incidents)
+        print(json.dumps(incidents))
 
 
 def match_issue(issue):

@@ -98,7 +98,8 @@ class PatternDatabase:
                     break
                 yield row
 
-    def update_patterns(self, issue_objects):
+    def update_patterns(self, issues):
+        issue_objects = {"issues": [issues._data]}
         for issue in issue_objects['issues']:
             if "pattern_object" not in issue["misc"]:
                 self.remove_pattern(issue["id"])
@@ -267,6 +268,37 @@ class IncidentGenerator:
             "incidents": incidents
         }
 
+    def generate_incidents_from_test(self, test):
+        kcidb_io_object = {"tests": [test._data],
+                           "builds": [test.build._data],
+                           "checkouts": [test.build.checkout._data]}
+        incidents = []
+
+        for row in self.db.get_all_patterns():
+            issue_id, issue_version, pattern_object_json = row
+            pattern_object = json.loads(pattern_object_json)
+            incidents.extend(self.generate_incident_on_match(kcidb_io_object, issue_id, issue_version, pattern_object))
+
+        return {
+            "version": KCIDB_IO_VERSION,
+            "incidents": incidents
+        }
+
+    def generate_incidents_from_build(self, build):
+        kcidb_io_object = {"builds": [build._data],
+                           "checkouts": [build.checkout._data]}
+        incidents = []
+
+        for row in self.db.get_all_patterns():
+            issue_id, issue_version, pattern_object_json = row
+            pattern_object = json.loads(pattern_object_json)
+            incidents.extend(self.generate_incident_on_match(kcidb_io_object, issue_id, issue_version, pattern_object))
+
+        return {
+            "version": KCIDB_IO_VERSION,
+            "incidents": incidents
+        }
+
     def generate_incidents_from_object(self, kcidb_io_object):
         incidents = []
 
@@ -368,7 +400,7 @@ def main():
 
     if args.update_patterns:
         issue_objects = json.load(sys.stdin)
-        IncidentGenerator().db.update_patterns(issue_objects)
+        IncidentGenerator().db.update_patterns(issue_objects["issues"])
         return
 
     if args.check_test_id or args.check_build_id:
