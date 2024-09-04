@@ -34,6 +34,6 @@ def match_build(build):
         client.submit(incidents)
 
 
-def match_issues(issue):
+def match_issue(issue):
     incident_generator = kcidb_match.IncidentGenerator()
     incident_generator.db.update_patterns(issue)
