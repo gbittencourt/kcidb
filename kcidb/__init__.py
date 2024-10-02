@@ -407,3 +407,25 @@ def ingest_main():
             )
             sys.stdout.write("\x00")
             sys.stdout.flush()
+import json
+def automatch_main():
+    """Execute the kcidb-automatch command-line tool"""
+    sys.excepthook = misc.log_and_print_excepthook
+    description = 'kcidb-automatch - '
+    parser = db.InputArgumentParser(database="sqlite::memory:",
+                                    description=description)
+    args = parser.parse_args()
+
+    print(args.database)
+    db_client = db.Client(args.database)
+    if not db_client.is_initialized():
+        db_client.init()
+    oo_client = oo.Client(db_client, sort=True)
+    io_schema = db_client.get_schema()[1]
+    
+    print(vars(db_client))
+    print(vars(oo_client))
+    print(io_schema)
+
+    #for data in misc.json_load_stream_fd(sys.stdin.fileno(), seq=args.seq_in):
+        #print(data)
